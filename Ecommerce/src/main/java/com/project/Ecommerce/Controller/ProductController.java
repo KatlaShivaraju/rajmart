@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -73,6 +74,22 @@ public class ProductController {
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf(type))
                 .body(product.getImage());
+    }
+    @PutMapping("/products/{id}")
+    public ResponseEntity<String> updateProduct(@PathVariable int id ,@RequestPart Product product,@RequestPart MultipartFile imagefile){
+        Product product1= null;
+        try {
+            product1 = service.updateProduct(id ,product,imagefile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if(product1!=null){
+            return new ResponseEntity<>("Successfully updated",HttpStatus.CREATED);
+
+        }
+        else{
+            return new ResponseEntity<>("Failed to update",HttpStatus.BAD_REQUEST);
+        }
     }
 
 

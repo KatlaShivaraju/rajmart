@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -32,6 +33,14 @@ public class ProductService {
   product.setImageName(imagefile.getOriginalFilename());
   product.setImageType(imagefile.getContentType());
   product.setImage(imagefile.getBytes());
+  return repo.save(product);
+ }
+
+
+ public Product updateProduct(int id, Product product, MultipartFile imagefile) throws IOException {
+ product.setImage(imagefile.getBytes());
+ product.setImageName(imagefile.getOriginalFilename());
+ product.setImageType(imagefile.getContentType());
   return repo.save(product);
  }
 }
