@@ -1,66 +1,86 @@
 package com.project.Ecommerce.Model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "products")
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy =
+            GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(
+            message =
+                    "Product name required"
+    )
     private String name;
+
     private String description;
+
     private String brand;
+
+    @DecimalMin(
+            value = "1",
+            message =
+                    "Price must be greater than 0"
+    )
     private BigDecimal price;
-    private String category;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd"
+    )
     private LocalDate releaseDate;
+
     private boolean available;
+
     private int quantity;
-    private String ImageName;
-    private String ImageType;
+
+    // Image metadata
+    private String imageName;
+
+    private String imageType;
+
     @Lob
-    private byte[] ImageData;
-
+    @Column(
+            name = "image_data",
+            columnDefinition = "LONGBLOB"
+    )
+    private byte[] imageData;
     public byte[] getImage() {
-        return ImageData;
+        return imageData;
     }
 
-    public void setImage(byte[] image) {
-        this.ImageData = image;
+    public void setImage(byte[] imageData) {
+        this.imageData = imageData;
+    }
+    public boolean isAvailable() {
+        return available;
     }
 
-    public String getImageType() {
-        return ImageType;
-    }
-
-    public void setImageType(String imageType) {
-        this.ImageType = imageType;
-    }
-    public String getImageName(){
-        return ImageName;
-    }
-    public void setImageName(String imageName){
-        this.ImageName=imageName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public String getBrand() {
@@ -71,6 +91,56 @@ public class Product {
         this.brand = brand;
     }
 
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -79,11 +149,20 @@ public class Product {
         this.price = price;
     }
 
-    public String getCategory() {
-        return category;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
     }
 }
+
