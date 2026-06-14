@@ -58,4 +58,26 @@ public class CartService {
 
         return "Item removed from cart";
     }
+
+    public Cart
+    updateQuantity(
+            Long cartId,
+            int quantity
+    ) {
+
+        Cart cart =
+                cartRepository
+                        .findById(cartId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Cart not found"
+                                ));
+
+        cart.setQuantity(
+                quantity
+        );
+
+        return cartRepository
+                .save(cart);
+    }
 }

@@ -1,33 +1,55 @@
 package com.project.Ecommerce.Service;
 
 import com.project.Ecommerce.Model.Product;
+import com.project.Ecommerce.Model.Category;
+
 import com.project.Ecommerce.Repository.ProductRepo;
+import com.project.Ecommerce.Repository.CategoryRepo;
+import com.project.Ecommerce.Repository.CartRepo;
+
+import com.project.Ecommerce.Exception
+        .ResourceNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.project.Ecommerce.Exception
-        .ResourceNotFoundException;
-
 @Service
 public class ProductService {
 
  private final ProductRepo repo;
+ private final CategoryRepo categoryRepo;
+ private final CartRepo cartRepo;
 
- public ProductService(ProductRepo repo) {
-  this.repo = repo;
+ public ProductService(
+
+         ProductRepo repo,
+
+         CategoryRepo categoryRepo,
+
+         CartRepo cartRepo
+ ) {
+
+  this.repo =
+          repo;
+
+  this.categoryRepo =
+          categoryRepo;
+
+  this.cartRepo =
+          cartRepo;
  }
-
 
  // ===========================
  // GET ALL PRODUCTS
  // ===========================
- public List<Product> getAllProducts() {
+ public List<Product>
+ getAllProducts() {
+
   return repo.findAll();
  }
-
 
  // ===========================
  // GET PRODUCT BY ID
@@ -38,6 +60,7 @@ public class ProductService {
 
   return repo.findById(id)
           .orElseThrow(() ->
+
                   new ResourceNotFoundException(
                           "Product not found with id "
                                   + id
@@ -45,49 +68,85 @@ public class ProductService {
           );
  }
 
-
  // ===========================
  // ADD PRODUCT
  // ===========================
  public Product addProduct(
+
          Product product,
-         MultipartFile imageFile
+
+         MultipartFile imageFile,
+
+         String category
+
  ) throws IOException {
 
+  Category categoryObj =
+
+          categoryRepo
+                  .findByName(
+                          category
+                  )
+                  .orElseThrow(() ->
+
+                          new RuntimeException(
+                                  "Category not found"
+                          )
+                  );
+
+  product.setCategory(
+          categoryObj
+  );
+
   product.setImageName(
-          imageFile.getOriginalFilename()
+
+          imageFile
+                  .getOriginalFilename()
   );
 
   product.setImageType(
-          imageFile.getContentType()
+
+          imageFile
+                  .getContentType()
   );
 
   product.setImageData(
-          imageFile.getBytes()
+
+          imageFile
+                  .getBytes()
   );
 
-  return repo.save(product);
+  return repo.save(
+          product
+  );
  }
-
 
  // ===========================
  // UPDATE PRODUCT
  // ===========================
  public Product updateProduct(
+
          int id,
+
          Product updatedProduct,
+
          MultipartFile imageFile
+
  ) throws IOException {
 
   Product existingProduct =
+
           repo.findById(id)
                   .orElse(null);
 
-  if (existingProduct == null) {
+  if (
+          existingProduct
+                  == null
+  ) {
+
    return null;
   }
 
-  // Update fields
   existingProduct.setName(
           updatedProduct.getName()
   );
@@ -104,10 +163,6 @@ public class ProductService {
           updatedProduct.getPrice()
   );
 
-//  existingProduct.setCategory(
-//          updatedProduct.getCategory()
-//  );
-
   existingProduct.setReleaseDate(
           updatedProduct.getReleaseDate()
   );
@@ -120,43 +175,99 @@ public class ProductService {
           updatedProduct.getQuantity()
   );
 
-  // Update image only if new image provided
-  if (imageFile != null &&
-          !imageFile.isEmpty()) {
+  // update image
+  if (
+          imageFile != null &&
+                  !imageFile.isEmpty()
+  ) {
 
    existingProduct.setImageName(
+
            imageFile
                    .getOriginalFilename()
    );
 
    existingProduct.setImageType(
+
            imageFile
                    .getContentType()
    );
 
    existingProduct.setImageData(
-           imageFile.getBytes()
+
+           imageFile
+                   .getBytes()
    );
   }
 
-  return repo.save(existingProduct);
+  return repo.save(
+          existingProduct
+  );
  }
 
 
  // ===========================
- // DELETE PRODUCT
- // ===========================
- public void deleteProduct(int id) {
-  repo.deleteById(id);
- }
+// DELETE PRODUCT
+// ===========================
+ public void deleteProduct(
+         int id
+ ) {
 
+  Product product =
+
+          repo.findById(id)
+                  .orElseThrow(() ->
+
+                          new RuntimeException(
+                                  "Product not found"
+                          )
+                  );
+
+  try {
+
+   // remove from carts
+   cartRepo
+           .deleteByProductId(
+                   id
+           );
+
+  } catch (Exception e) {
+
+   System.out.println(
+           "Cart delete error: "
+                   + e.getMessage()
+   );
+  }
+
+  repo.deleteById(
+          id
+  );
+ }
 
  // ===========================
  // SEARCH PRODUCTS
  // ===========================
- public List<Product> searchProducts(
+ public List<Product>
+ searchProducts(
          String keyword
  ) {
-  return repo.searchProducts(keyword);
+
+  return repo.searchProducts(
+          keyword
+  );
+ }
+
+ // ===========================
+ // CATEGORY FILTER
+ // ===========================
+ public List<Product>
+ getProductsByCategory(
+         String category
+ ) {
+
+  return repo
+          .findByCategory_Name(
+                  category
+          );
  }
 }
