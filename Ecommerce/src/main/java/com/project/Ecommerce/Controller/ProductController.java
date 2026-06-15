@@ -39,13 +39,6 @@ public class ProductController {
         List<Product> products =
                 service.getAllProducts();
 
-        if (products.isEmpty()) {
-
-            return ResponseEntity
-                    .noContent()
-                    .build();
-        }
-
         return ResponseEntity.ok(
                 products
         );
