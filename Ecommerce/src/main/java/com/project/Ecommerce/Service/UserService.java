@@ -22,82 +22,41 @@ public class UserService {
     // SEND OTP
     // ==========================
 
-    public String sendOtp(
-            String email
-    ) {
+    public String sendOtp(String email) {
 
         String otp =
-
                 String.valueOf(
-
-                        (int)
-                                (
-                                        Math.random()
-                                                * 900000
-                                )
-
-                                + 100000
+                        (int) (
+                                Math.random() * 900000
+                        ) + 100000
                 );
 
         User user =
                 userRepository
-                        .findByEmail(
-                                email
-                        )
-                        .orElse(
-                                null
-                        );
-
-        // EXISTING USER
+                        .findByEmail(email)
+                        .orElse(null);
 
         if (user == null) {
 
             user = new User();
-
-            user.setEmail(
-                    email
-            );
-
-            // TEMP VALUES
-            // to bypass validation
-
-            user.setName(
-                    "TEMP_USER"
-            );
-
-            user.setPassword(
-                    "TEMP_PASSWORD"
-            );
-
-            user.setRole(
-                    "USER"
-            );
+            user.setEmail(email);
+            user.setName("TEMP_USER");
+            user.setPassword("TEMP_PASSWORD");
+            user.setRole("USER");
         }
 
-        user.setOtp(
-                otp
+        user.setOtp(otp);
+        user.setVerified(false);
+
+        userRepository.save(user);
+
+        System.out.println(
+                "OTP for " + email +
+                        " : " + otp
         );
 
-        user.setVerified(
-                false
-        );
-
-        userRepository.save(
-                user
-        );
-
-        emailService
-                .sendOtpEmail(
-
-                        email,
-
-                        otp
-                );
-
-        return
-                "OTP Sent Successfully";
+        return otp;
     }
-
     // ==========================
     // VERIFY OTP
     // ==========================
