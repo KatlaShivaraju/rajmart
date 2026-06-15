@@ -1,6 +1,7 @@
 package com.project.Ecommerce.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
     public void sendOtpEmail(
 
             String toEmail,
@@ -18,30 +22,50 @@ public class EmailService {
             String otp
     ) {
 
-        SimpleMailMessage message =
-                new SimpleMailMessage();
+        try {
 
-        message.setTo(
-                toEmail
-        );
+            SimpleMailMessage message =
+                    new SimpleMailMessage();
 
-        message.setSubject(
-                "RajMart Email Verification"
-        );
+            message.setFrom(
+                    fromEmail
+            );
 
-        message.setText(
+            message.setTo(
+                    toEmail
+            );
 
-                "Welcome to RajMart!\n\n"
+            message.setSubject(
+                    "RajMart Email Verification"
+            );
 
-                        + "Your OTP is: "
+            message.setText(
 
-                        + otp
+                    "Welcome to RajMart!\n\n"
 
-                        + "\n\nThis OTP expires soon."
-        );
+                            + "Your OTP is: "
 
-        mailSender.send(
-                message
-        );
+                            + otp
+
+                            + "\n\nThis OTP expires soon."
+            );
+
+            mailSender.send(
+                    message
+            );
+
+            System.out.println(
+                    "Email sent successfully"
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            throw new RuntimeException(
+                    "Email failed: "
+                            + e.getMessage()
+            );
+        }
     }
 }
