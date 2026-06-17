@@ -21,8 +21,9 @@ public class UserService {
     // ==========================
     // SEND OTP
     // ==========================
-
-    public String sendOtp(String email) {
+    public String sendOtp(
+            String email
+    ) {
 
         String otp =
                 String.valueOf(
@@ -39,23 +40,43 @@ public class UserService {
         if (user == null) {
 
             user = new User();
-            user.setEmail(email);
-            user.setName("TEMP_USER");
-            user.setPassword("TEMP_PASSWORD");
-            user.setRole("USER");
+
+            user.setEmail(
+                    email
+            );
+
+            user.setName(
+                    "TEMP_USER"
+            );
+
+            user.setPassword(
+                    "TEMP_PASSWORD"
+            );
+
+            user.setRole(
+                    "USER"
+            );
         }
 
-        user.setOtp(otp);
-        user.setVerified(false);
-
-        userRepository.save(user);
-
-        System.out.println(
-                "OTP for " + email +
-                        " : " + otp
+        user.setOtp(
+                otp
         );
 
-        return otp;
+        user.setVerified(
+                false
+        );
+
+        userRepository.save(
+                user
+        );
+
+        emailService.sendOtpEmail(
+                email,
+                otp
+        );
+
+        return
+                "OTP Sent Successfully";
     }
     // ==========================
     // VERIFY OTP
