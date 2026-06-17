@@ -1,32 +1,63 @@
 import axios from "axios";
 
 const API_URL =
-  "http://localhost:8080/api/cart";
+`${import.meta.env.VITE_API_URL}/api/cart`;
 
 export const addToCart =
-  async (
-    userId,
-    productId,
-    quantity
-  ) => {
+async (
+  userId,
+  productId,
+  quantity
+) => {
 
-    return await axios.post(
-      `${API_URL}/add?userId=${userId}&productId=${productId}&quantity=${quantity}`
-    );
-  };
+  return await axios.post(
+
+    `${API_URL}/add`,
+
+    null,
+
+    {
+      params: {
+        userId,
+        productId,
+        quantity
+      }
+    }
+  );
+};
 
 export const getCart =
-  async (userId) => {
+async (userId) => {
 
-    return await axios.get(
-      `${API_URL}/${userId}`
-    );
-  };
+  return await axios.get(
+    `${API_URL}/${userId}`
+  );
+};
 
 export const removeCartItem =
-  async (id) => {
+async (cartId) => {
 
-    return await axios.delete(
-      `${API_URL}/remove/${id}`
-    );
-  };
+  return await axios.delete(
+    `${API_URL}/${cartId}`
+  );
+};
+
+export const updateCartQuantity =
+async (
+  cartId,
+  quantity
+) => {
+
+  return await axios.put(
+
+    `${API_URL}/${cartId}`,
+
+    null,
+
+    {
+      params: {
+        quantity
+      }
+    }
+  );
+};
