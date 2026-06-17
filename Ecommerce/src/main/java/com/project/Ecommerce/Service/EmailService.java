@@ -1,59 +1,76 @@
 package com.project.Ecommerce.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
-//    @Value("${spring.mail.username}")
-//    private String fromEmail;
+    private final RestTemplate restTemplate =
+            new RestTemplate();
 
     public void sendOtpEmail(
-
             String toEmail,
-
             String otp
     ) {
 
+        String url =
+                "https://api.brevo.com/v3/smtp/email";
+
+        HttpHeaders headers =
+                new HttpHeaders();
+
+        headers.setContentType(
+                MediaType.APPLICATION_JSON
+        );
+
+        headers.set(
+                "api-key",
+                apiKey
+        );
+
+        String body = """
+        {
+          "sender": {
+            "name": "RajMart",
+            "email": "code2placementt@gmail.com"
+          },
+          "to": [
+            {
+              "email": "%s"
+            }
+          ],
+          "subject": "RajMart Email Verification",
+          "htmlContent": "<h2>Your OTP is: %s</h2><p>This OTP expires soon.</p>"
+        }
+        """.formatted(
+                toEmail,
+                otp
+        );
+
+        HttpEntity<String> request =
+                new HttpEntity<>(
+                        body,
+                        headers
+                );
+
         try {
 
-            SimpleMailMessage message =
-                    new SimpleMailMessage();
-
-//
-
-            message.setTo(
-                    toEmail
-            );
-
-            message.setSubject(
-                    "RajMart Email Verification"
-            );
-
-            message.setText(
-
-                    "Welcome to RajMart!\n\n"
-
-                            + "Your OTP is: "
-
-                            + otp
-
-                            + "\n\nThis OTP expires soon."
-            );
-
-            mailSender.send(
-                    message
-            );
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(
+                            url,
+                            request,
+                            String.class
+                    );
 
             System.out.println(
-                    "Email sent successfully"
+                    "Brevo Response: "
+                            + response.getBody()
             );
 
         } catch (Exception e) {
@@ -61,7 +78,7 @@ public class EmailService {
             e.printStackTrace();
 
             throw new RuntimeException(
-                    "Email failed: "
+                    "Brevo Error: "
                             + e.getMessage()
             );
         }

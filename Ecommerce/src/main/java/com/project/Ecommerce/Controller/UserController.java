@@ -3,6 +3,7 @@ package com.project.Ecommerce.Controller;
 import com.project.Ecommerce.DTO.LoginRequest;
 import com.project.Ecommerce.DTO.RegisterRequest;
 import com.project.Ecommerce.Model.User;
+import com.project.Ecommerce.Repository.UserRepo;
 import com.project.Ecommerce.Service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class UserController {
                         )
         );
     }
+
+
+
 
     // ==========================
     // VERIFY OTP
